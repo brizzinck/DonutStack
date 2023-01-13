@@ -19,7 +19,8 @@ public class DonutStack : MonoBehaviour
     {
         donut.transform.parent = transform;
         donut.transform.DOMove(_donuts[_donuts.Count - 1].transform.position 
-            + new Vector3(0, 0.325f, 0), 0.3f).OnComplete(() => { Remove(donutStack); _donuts.Add(donut); ComboAnalyzer.FindMatchingStacks(); });
+            + new Vector3(0, 0.325f, 0), 0.3f).OnComplete(() => { Remove(donutStack); _donuts.Add(donut); 
+                ComboAnalyzer.FindMatchingStacks(); });
         CheckFullStack(this);
     }
     public void Remove(DonutStack donut)

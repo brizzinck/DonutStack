@@ -8,7 +8,7 @@ public class MoverDonutStack : MonoBehaviour
 {
     [SerializeField] private SpawDonutStack _spawDonut;
     [SerializeField] private ComboAnalyzer _comboAnalyzer;
-    private bool _canShoot = true;
+    private static bool _canShoot = true;
     public void MoveDonutStack(Transform transform)
     {
         Row row = transform.GetComponent<Row>();
@@ -23,14 +23,22 @@ public class MoverDonutStack : MonoBehaviour
                     row.Cells[i].transform.position.x,
                     current.transform.position.y,
                     current.transform.position.z);
-                current.transform.DOMove(row.Cells[i].transform.position + new Vector3(0, 0.2f, 0), 0.3f).
-                    OnComplete(() => { _canShoot = true; ComboAnalyzer.FindMatchingStacks(); });
-                row.Cells[i].IsFree = false;
-                row.Cells[i].SetDonutStack(current);
-                current.transform.parent = row.Cells[i].transform;
+                SetParametersNewPostion(row.Cells[i], current);
                 _spawDonut.SpawnDonutStack();
                 break;
             }
         }
+    }
+
+    public static void SetParametersNewPostion(Cell cell, DonutStack donutStack)
+    {
+        cell.SetDonutStack(donutStack);
+        AnimationMove(cell.transform.position, donutStack);
+    }
+
+    private static void AnimationMove(Vector3 position, DonutStack donutStack)
+    {
+        donutStack.transform.DOMove(position + new Vector3(0, 0.2f, 0), 0.3f).
+                            OnComplete(() => { _canShoot = true; ComboAnalyzer.FindMatchingStacks(); });
     }
 }

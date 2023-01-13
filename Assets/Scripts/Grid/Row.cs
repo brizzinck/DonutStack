@@ -11,6 +11,10 @@ public class Row : MonoBehaviour
     {
         for (int i = 0; i < _cells.Length; i++)
         {
+            if (i + 1 < _cells.Length - 1)
+            {
+                _cells[i].DonutScreed += _cells[i + 1].DonutScreeder;
+            }
         }
     }
 }

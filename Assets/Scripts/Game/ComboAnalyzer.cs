@@ -38,7 +38,7 @@ public class ComboAnalyzer : MonoBehaviour
         {
             donutStacks.Add(grid.Cells[i - 1, j].DonutStack);
         }
-        else if (!grid.Cells[i + 1, j].IsFree &&
+        if (!grid.Cells[i + 1, j].IsFree &&
             grid.Cells[i + 1, j].DonutStack.Donuts[grid.Cells[i + 1, j].DonutStack.Donuts.Count - 1].ColorName == color)
         {
             donutStacks.Add(grid.Cells[i + 1, j].DonutStack);
@@ -48,7 +48,7 @@ public class ComboAnalyzer : MonoBehaviour
         {
             donutStacks.Add(grid.Cells[i, j - 1].DonutStack);
         }
-        else if (!grid.Cells[i, j + 1].IsFree &&
+        if (!grid.Cells[i, j + 1].IsFree &&
             grid.Cells[i, j + 1].DonutStack.Donuts[grid.Cells[i, j + 1].DonutStack.Donuts.Count - 1].ColorName == color)
         {
             donutStacks.Add(grid.Cells[i, j + 1].DonutStack);
@@ -65,9 +65,9 @@ public class ComboAnalyzer : MonoBehaviour
         DonutStack donutStack = donutStacks[0];
         for (int i = 0; i < donutStacks.Count; i++)
         {
-            if (i - 1 > 0) 
+            if (i + 1 < donutStacks.Count - 1) 
             {
-                if (donutStacks[i].Donuts.Count <= donutStacks[i - 1].Donuts.Count)
+                if (donutStacks[i].Donuts.Count < donutStacks[i + 1].Donuts.Count)
                 {
                     donutStack = donutStacks[i];
                 }
