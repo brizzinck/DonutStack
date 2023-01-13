@@ -24,7 +24,7 @@ public class MoverDonutStack : MonoBehaviour
                     current.transform.position.y,
                     current.transform.position.z);
                 current.transform.DOMove(row.Cells[i].transform.position + new Vector3(0, 0.2f, 0), 0.3f).
-                    OnComplete(() => { _canShoot = true; _comboAnalyzer.FindMatchingStacks(current); });
+                    OnComplete(() => { _canShoot = true; ComboAnalyzer.FindMatchingStacks(); });
                 row.Cells[i].IsFree = false;
                 row.Cells[i].SetDonutStack(current);
                 current.transform.parent = row.Cells[i].transform;

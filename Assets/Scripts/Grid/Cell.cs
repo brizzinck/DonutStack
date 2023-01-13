@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Cell : MonoBehaviour
 {
+    public UnityAction DonutScreed;
     private bool _isFree = true;
     private DonutStack _donutStack;
     public bool IsFree { get => _isFree; set => _isFree = value; }
@@ -17,5 +19,6 @@ public class Cell : MonoBehaviour
     public void SetFree()
     {
         _isFree = true;
+        DonutScreed?.Invoke();
     }
 }
