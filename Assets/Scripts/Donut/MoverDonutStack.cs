@@ -33,10 +33,10 @@ public class MoverDonutStack : MonoBehaviour
     public static void SetParametersNewPostion(Cell cell, DonutStack donutStack)
     {
         cell.SetDonutStack(donutStack);
-        AnimationMove(cell.transform.position, donutStack);
+        AnimationMove(cell.transform.position, donutStack, cell);
     }
 
-    private static void AnimationMove(Vector3 position, DonutStack donutStack)
+    private static void AnimationMove(Vector3 position, DonutStack donutStack, Cell cell)
     {
         donutStack.transform.DOMove(position + new Vector3(0, 0.2f, 0), 0.3f).
                             OnComplete(() => { _canShoot = true; ComboAnalyzer.FindMatchingStacks(); });

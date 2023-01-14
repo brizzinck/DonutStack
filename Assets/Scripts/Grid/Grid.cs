@@ -18,6 +18,7 @@ public class Grid : MonoBehaviour
             for (int j = 0; j < _rows[i].Cells.Length; j++)
             {
                 Cells[i, j] = _rows[i].Cells[j];
+                Cells[i, j].Cordinate = new Vector2Int(i, j);
             }
         }
     }

@@ -9,6 +9,7 @@ public class DonutStack : MonoBehaviour
     public UnityAction DestroyDonutStack;
     [SerializeField] private Donut _donut;
     [SerializeField] private Material[] _materials;
+    private Cell _cell;
     private List<Material> _dataMeterials;
     private int _donutNumber;
     private List<Donut> _donuts = new List<Donut>();
@@ -19,17 +20,24 @@ public class DonutStack : MonoBehaviour
     {
         donut.transform.parent = transform;
         donut.transform.DOMove(_donuts[_donuts.Count - 1].transform.position 
-            + new Vector3(0, 0.325f, 0), 0.3f).OnComplete(() => { Remove(donutStack); _donuts.Add(donut); 
-                ComboAnalyzer.FindMatchingStacks(); });
-        CheckFullStack(this);
+            + new Vector3(0, 0.325f, 0), 0.3f).OnComplete(() => { 
+                Remove(donutStack); 
+                _donuts.Add(donut);
+                CheckFullStack(this);
+                ComboAnalyzer.FindMatchingStacks(_cell); 
+            });
     }
     public void Remove(DonutStack donut)
     {
         donut.Donuts.RemoveAt(donut.Donuts.Count - 1);
         if (donut.Donuts.Count == 0)
         {
-            Destroy(donut);
+            DestroyStack(donut);
         }
+    }
+    public void SetCell(Cell cell)
+    {
+        _cell = cell;
     }
     private void Start()
     {
@@ -54,7 +62,7 @@ public class DonutStack : MonoBehaviour
     }
     private void CheckFullStack(DonutStack donut)
     {
-        if (donut.Donuts.Count == 3)
+        if (donut.Donuts.Count >= 3)
         {
             bool colorCheck = true;
             string colorName = donut.Donuts[0].ColorName;
@@ -65,11 +73,11 @@ public class DonutStack : MonoBehaviour
             }
             if (colorCheck)
             {
-                Destroy(donut);
+                DestroyStack(donut);
             }
         }
     }
-    private static void Destroy(DonutStack donut)
+    private static void DestroyStack(DonutStack donut)
     {
         donut.DestroyDonutStack?.Invoke();
         Destroy(donut.gameObject);
