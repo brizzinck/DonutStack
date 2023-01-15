@@ -1,18 +1,20 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 
 public class ComboAnalyzer : MonoBehaviour
 {
     [SerializeField] private Grid _grid;
     private static Grid grid;
-    public static void FindMatchingStacks(Cell cell)
-    {
-        CheckAndCombineWithNeighbors(cell.Cordinate.x, cell.Cordinate.y);
-    }
+    private static bool _combination = false;
+
+    public static bool Combination { get => _combination; set => _combination = value; }
     public static void FindMatchingStacks()
     {
+        if (_combination) return;
+        _combination = true;
         bool breaked = false;
         for (int i = 0; i < grid.Cells.GetLength(0); i++)
         {
@@ -21,18 +23,34 @@ public class ComboAnalyzer : MonoBehaviour
             {
                 if (!grid.Cells[i, j].IsFree)
                 {
-                    breaked = CheckAndCombineWithNeighbors(i, j);
+                    breaked = CheckCombine(i, j);
                     if (breaked) break;
                 }
             }
         }
+        if (!breaked) 
+            _combination = false;
     }
     private void Awake()
     {
         grid = _grid;
     }
 
-    private static bool CheckAndCombineWithNeighbors(int i, int j)
+    private static bool CheckCombine(int i, int j)
+    {
+        List<DonutStack> donutStacks = new List<DonutStack>();
+        string color = grid.Cells[i, j].DonutStack.Donuts[grid.Cells[i, j].DonutStack.Donuts.Count - 1].ColorName;
+        donutStacks = CheckNeighbors(i, j);
+        if (donutStacks.Count > 0)
+        {
+            DonutStack donutStack = Prioritize(donutStacks, color);
+            CheckWhoCombine(grid.Cells[i, j].DonutStack, donutStack, color);
+            return true;
+        }
+        return false;
+    }
+
+    public static List<DonutStack> CheckNeighbors(int i, int j)
     {
         string color = grid.Cells[i, j].DonutStack.Donuts[grid.Cells[i, j].DonutStack.Donuts.Count - 1].ColorName;
         List<DonutStack> donutStacks = new List<DonutStack>();
@@ -68,30 +86,73 @@ public class ComboAnalyzer : MonoBehaviour
                 donutStacks.Add(grid.Cells[i, j + 1].DonutStack);
             }
         }
-        if (donutStacks.Count > 0)
-        {
-            DonutStack donutStack = Prioritize(donutStacks);
-            if (donutStack.Donuts.Count < grid.Cells[i, j].DonutStack.Donuts.Count)
-            {
-                CombineDonutStack(grid.Cells[i, j].DonutStack, donutStack);
-            }
-            else
-                CombineDonutStack(donutStack, grid.Cells[i, j].DonutStack);
-            return true;
-        }
-        return false;
+        return donutStacks;
     }
-    private static DonutStack Prioritize(List<DonutStack> donutStacks)
+
+    private static void CheckWhoCombine(DonutStack donutStack1, DonutStack donutStack, string color)
     {
-        DonutStack donutStack = donutStacks[0];
+        if (DonutStack.CheckColored(donutStack1, color) &&
+            DonutStack.CheckColored(donutStack, color))
+            CheckCount(donutStack1, donutStack, false);
+        else if (DonutStack.CheckColored(donutStack1, color))
+            CombineDonutStack(donutStack, donutStack1);
+        else if (DonutStack.CheckColored(donutStack, color))
+            CombineDonutStack(donutStack1, donutStack);
+        else 
+            CheckCount(donutStack1, donutStack, true);
+    }
+
+    private static void CheckCount(DonutStack donutStack1, DonutStack donutStack, bool whoCheck)
+    {
+        if (whoCheck)
+        {
+            if (donutStack.Donuts.Count < donutStack1.Donuts.Count)
+                CombineDonutStack(donutStack1, donutStack);
+            else
+                CombineDonutStack(donutStack, donutStack1);
+        }
+        else if (!whoCheck)
+        {
+            if (donutStack.Donuts.Count < donutStack1.Donuts.Count)
+                CombineDonutStack(donutStack, donutStack1);
+            else
+                CombineDonutStack(donutStack1, donutStack);
+        }
+    }
+
+    public static DonutStack Prioritize(List<DonutStack> donutStacks, string color)
+    {
+        DonutStack donutStack = null;
+        if (donutStacks.Count == 0) return null;
+        if (donutStacks.Count == 1) return donutStacks[0];
+        Debug.Log(donutStacks.Count);
         for (int i = 0; i < donutStacks.Count; i++)
         {
+            if (i + 1 < donutStacks.Count)
+            {
+                if (DonutStack.CheckColored(donutStacks[i], color) && DonutStack.CheckColored(donutStacks[i + 1], color))
+                {
+                    if (donutStacks[i].Donuts.Count <= donutStacks[i + 1].Donuts.Count)
+                    {
+                        donutStack = donutStacks[i];
+                    }
+                    else donutStack = donutStacks[i + 1];
+                }
+                else if (DonutStack.CheckColored(donutStacks[i], color))
+                    donutStack = donutStacks[i];
+                else if (DonutStack.CheckColored(donutStacks[i + 1], color))
+                    donutStack = donutStacks[i + 1];
+            }
+        }
+        if (donutStack != null) return donutStack;
+        for (int i = 0; i < donutStacks.Count; i++)
+        {       
             if (i + 1 < donutStacks.Count) 
             {
-                if (donutStacks[i].Donuts.Count < donutStacks[i + 1].Donuts.Count)
+                if (donutStacks[i].Donuts.Count <= donutStacks[i + 1].Donuts.Count)
                 {
                     donutStack = donutStacks[i];
-                }
+                }    
             }
         }
         return donutStack;

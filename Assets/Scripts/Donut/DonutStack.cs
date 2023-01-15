@@ -14,8 +14,18 @@ public class DonutStack : MonoBehaviour
     private int _donutNumber;
     private List<Donut> _donuts = new List<Donut>();
     private Vector3 _spawnDonutPostion;
-
     public List<Donut> Donuts { get => _donuts; }
+    public Cell Cell { get => _cell; }
+
+    public static bool CheckColored(DonutStack donut, string color)
+    {
+        for (int i = 0; i < donut.Donuts.Count; i++)
+        {
+            if (donut.Donuts[i].ColorName != color)
+                return false;
+        }
+        return true;
+    }
     public void MergeDonutStack(Donut donut, DonutStack donutStack)
     {
         donut.transform.parent = transform;
@@ -24,7 +34,8 @@ public class DonutStack : MonoBehaviour
                 Remove(donutStack); 
                 _donuts.Add(donut);
                 CheckFullStack(this);
-                ComboAnalyzer.FindMatchingStacks(_cell); 
+                ComboAnalyzer.FindMatchingStacks();
+                ComboAnalyzer.Combination = false;
             });
     }
     public void Remove(DonutStack donut)
@@ -64,13 +75,7 @@ public class DonutStack : MonoBehaviour
     {
         if (donut.Donuts.Count >= 3)
         {
-            bool colorCheck = true;
-            string colorName = donut.Donuts[0].ColorName;
-            for (int i = 0; i < donut.Donuts.Count; i++)
-            {
-                if (donut.Donuts[i].ColorName == colorName) continue;
-                colorCheck = false;
-            }
+            bool colorCheck = CheckColored(donut, donut.Donuts[0].ColorName);
             if (colorCheck)
             {
                 DestroyStack(donut);
