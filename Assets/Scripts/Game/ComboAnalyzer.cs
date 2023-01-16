@@ -21,7 +21,7 @@ public class ComboAnalyzer : MonoBehaviour
             if (breaked) break;
             for (int j = 0; j < grid.Cells.GetLength(1); j++)
             {
-                if (!grid.Cells[i, j].IsFree)
+                if (!grid.Cells[i, j].IsFree && grid.Cells[i, j].DonutStack.Donuts.Count < 3)
                 {
                     breaked = CheckCombine(i, j);
                     if (breaked) break;
@@ -124,8 +124,7 @@ public class ComboAnalyzer : MonoBehaviour
     {
         DonutStack donutStack = null;
         if (donutStacks.Count == 0) return null;
-        if (donutStacks.Count == 1) return donutStacks[0];
-        Debug.Log(donutStacks.Count);
+        else if (donutStacks.Count == 1) return donutStacks[0];
         for (int i = 0; i < donutStacks.Count; i++)
         {
             if (i + 1 < donutStacks.Count)
@@ -133,10 +132,9 @@ public class ComboAnalyzer : MonoBehaviour
                 if (DonutStack.CheckColored(donutStacks[i], color) && DonutStack.CheckColored(donutStacks[i + 1], color))
                 {
                     if (donutStacks[i].Donuts.Count <= donutStacks[i + 1].Donuts.Count)
-                    {
                         donutStack = donutStacks[i];
-                    }
-                    else donutStack = donutStacks[i + 1];
+                    else
+                        donutStack = donutStacks[i + 1];
                 }
                 else if (DonutStack.CheckColored(donutStacks[i], color))
                     donutStack = donutStacks[i];
